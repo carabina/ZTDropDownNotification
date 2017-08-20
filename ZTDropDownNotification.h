@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-extern NSString *const _Nonnull ZTDropDownNotificationInfoKey;
-extern NSString *const _Nonnull ZTDropDownNotificationSuccessKey;
-extern NSString *const _Nonnull ZTDropDownNotificationFailureKey;
+extern NSString *const _Nonnull ZTDropDownNotificationInfoIconKey;
+extern NSString *const _Nonnull ZTDropDownNotificationSuccessIconKey;
+extern NSString *const _Nonnull ZTDropDownNotificationFailureIconKey;
 
 @interface ZTDropDownNotification : NSObject
 + (void)registerIconSets:(NSDictionary<NSString *, UIImage *> *_Nonnull)iconSets;

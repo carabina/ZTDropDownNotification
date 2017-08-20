@@ -8,17 +8,149 @@
 
 #import "ZTDropDownNotification.h"
 
-NSString *const _Nonnull ZTDropDownNotificationInfoKey = @"ZTDropDownNotificationInfoKey";
-NSString *const _Nonnull ZTDropDownNotificationSuccessKey = @"ZTDropDownNotificationSuccessKey";
-NSString *const _Nonnull ZTDropDownNotificationFailureKey = @"ZTDropDownNotificationFailureKey";
+NSString *const _Nonnull ZTDropDownNotificationInfoIconKey = @"ZTDropDownNotificationInfoIconKey";
+NSString *const _Nonnull ZTDropDownNotificationSuccessIconKey = @"ZTDropDownNotificationSuccessIconKey";
+NSString *const _Nonnull ZTDropDownNotificationFailureIconKey = @"ZTDropDownNotificationFailureIconKey";
 
-static const CGFloat marginH = 12, padding = 8;
-static const CGFloat statusBarHeight = 20, navigationBarHeight = 44;
-static const CGFloat iconLength = 20;
-static const CGFloat viewHeight = statusBarHeight + navigationBarHeight;
+static const CGFloat HorizontalMargin = 12, StandardPadding = 8;
+static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
+
+@protocol NotificationLayout
+@property(nonatomic, assign, readonly) CGFloat contentHeight;
+- (void)setIcon:(UIImage *)icon;
+- (void)setMessage:(NSString *)message;
+@end
+
+@interface TextOnlyLayout : UIView <NotificationLayout>
+@property(nonatomic) UILabel *labelView;
+@end
+
+@implementation TextOnlyLayout
+- (instancetype)init {
+  if (self = [super init]) {
+    [self setupBackground];
+    [self setupLabelView];
+  }
+  return self;
+}
+
+- (void)setupBackground {
+  self.backgroundColor = [UIColor whiteColor];
+  self.layer.shadowColor = [[UIColor lightGrayColor] CGColor];
+  self.layer.shadowOffset = CGSizeMake(0, 1);
+  self.layer.shadowOpacity = 0.9;
+}
+
+- (void)setupLabelView {
+  self.labelView = [UILabel new];
+  self.labelView.translatesAutoresizingMaskIntoConstraints = NO;
+  self.labelView.font = [UIFont systemFontOfSize:15];
+  self.labelView.textAlignment = NSTextAlignmentCenter;
+  [self addSubview:self.labelView];
+
+  [self addConstraints:
+      [NSLayoutConstraint constraintsWithVisualFormat:@"|-(margin)-[labelView]-(margin)-|"
+                                              options:NSLayoutFormatAlignAllCenterY
+                                              metrics:@{
+                                                  @"margin": @(HorizontalMargin),
+                                              }
+                                                views:@{
+                                                    @"labelView": self.labelView
+                                                }]];
+
+  [self addConstraints:
+      [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(margin)-[labelView(==height)]|"
+                                              options:NSLayoutFormatDirectionLeadingToTrailing
+                                              metrics:@{
+                                                  @"margin": @(StandardPadding + StatusBarHeight),
+                                                  @"height": @(NavigationBarHeight)
+                                              }
+                                                views:@{
+                                                    @"labelView": self.labelView
+                                                }]];
+}
+
+- (void)setIcon:(UIImage *)icon {}
+
+- (void)setMessage:(NSString *)message {
+  self.labelView.text = message;
+}
+
+- (CGFloat)contentHeight {
+  return StatusBarHeight + NavigationBarHeight;
+}
+@end
+
+@interface DefaultLayout : UIView <NotificationLayout>
+@property(nonatomic) UIImageView *iconView;
+@property(nonatomic) UILabel *labelView;
+@end
+
+@implementation DefaultLayout
+- (instancetype)init {
+  if (self = [super init]) {
+    [self setupBackground];
+    [self setupSubviews];
+  }
+  return self;
+}
+
+- (void)setupBackground {
+  self.backgroundColor = [UIColor whiteColor];
+  self.layer.shadowColor = [[UIColor lightGrayColor] CGColor];
+  self.layer.shadowOffset = CGSizeMake(0, 1);
+  self.layer.shadowOpacity = 0.9;
+}
+
+- (void)setupSubviews {
+  self.iconView = [UIImageView new];
+  self.iconView.translatesAutoresizingMaskIntoConstraints = NO;
+  [self addSubview:self.iconView];
+
+  self.labelView = [UILabel new];
+  self.labelView.translatesAutoresizingMaskIntoConstraints = NO;
+  self.labelView.font = [UIFont systemFontOfSize:15];
+  [self addSubview:self.labelView];
+
+  [self addConstraints:
+      [NSLayoutConstraint constraintsWithVisualFormat:@"|-(margin)-[iconView]-(padding)-[labelView]-(margin)-|"
+                                              options:NSLayoutFormatAlignAllCenterY
+                                              metrics:@{
+                                                  @"margin": @(HorizontalMargin),
+                                                  @"padding": @(StandardPadding),
+                                              }
+                                                views:@{
+                                                    @"iconView": self.iconView,
+                                                    @"labelView": self.labelView
+                                                }]];
+
+  [self addConstraints:
+      [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(margin)-[labelView(==height)]|"
+                                              options:NSLayoutFormatDirectionLeadingToTrailing
+                                              metrics:@{
+                                                  @"margin": @(StandardPadding + StatusBarHeight),
+                                                  @"height": @(NavigationBarHeight)
+                                              }
+                                                views:@{
+                                                    @"labelView": self.labelView
+                                                }]];
+}
+
+- (void)setIcon:(UIImage *)icon {
+  NSAssert(icon, @"icon cannot be nil");
+  self.iconView.image = icon;
+}
+
+- (void)setMessage:(NSString *)message {
+  self.labelView.text = message;
+}
+
+- (CGFloat)contentHeight {
+  return StatusBarHeight + NavigationBarHeight;
+}
+@end
 
 @interface ZTDropDownNotification ()
-
 @property(nonatomic) NSMutableDictionary<NSString *, UIImage *> *iconSets;
 @end
 
@@ -49,63 +181,64 @@ static const CGFloat viewHeight = statusBarHeight + navigationBarHeight;
 }
 
 + (void)notifyInfoMessage:(NSString *_Nonnull)message {
-  [ZTDropDownNotification notifyMessage:message withIconKey:ZTDropDownNotificationInfoKey];
+  [ZTDropDownNotification notifyMessage:message withIconKey:ZTDropDownNotificationInfoIconKey];
 }
 
 + (void)notifySuccessMessage:(NSString *_Nonnull)message {
-  [ZTDropDownNotification notifyMessage:message withIconKey:ZTDropDownNotificationSuccessKey];
+  [ZTDropDownNotification notifyMessage:message withIconKey:ZTDropDownNotificationSuccessIconKey];
 }
 
 + (void)notifyFailureMessage:(NSString *_Nonnull)message {
-  [ZTDropDownNotification notifyMessage:message withIconKey:ZTDropDownNotificationFailureKey];
+  [ZTDropDownNotification notifyMessage:message withIconKey:ZTDropDownNotificationFailureIconKey];
 }
 
 + (void)notifyMessage:(NSString *_Nonnull)message withIcon:(UIImage *_Nullable)icon {
   NSAssert([NSThread isMainThread], @"[ZTDropDownNotification notifyMessage:withIcon:] should run in main thread");
   NSAssert(message, @"message cannot be nil");
 
-  const CGRect originalFrame = CGRectMake(0, -viewHeight, CGRectGetWidth([[UIScreen mainScreen] bounds]), viewHeight);
-  UIView *view = [[UIView alloc] initWithFrame:originalFrame];
-  view.backgroundColor = [UIColor whiteColor];
-  view.layer.shadowColor = [[UIColor lightGrayColor] CGColor];
-  view.layer.shadowOffset = CGSizeMake(0, 1);
-  view.layer.shadowOpacity = 0.9;
-  [[[UIApplication sharedApplication] keyWindow] addSubview:view];
+  UIView <NotificationLayout> *layout = icon ? [DefaultLayout new] : [TextOnlyLayout new];
+  layout.translatesAutoresizingMaskIntoConstraints = NO;
+  [layout setMessage:message];
+  [layout setIcon:icon];
 
-  CGRect textLabelFrame = CGRectMake(marginH, statusBarHeight, CGRectGetWidth(view.bounds) - marginH * 2, navigationBarHeight);
-  UILabel *textLabel = [[UILabel alloc] initWithFrame:textLabelFrame];
-  textLabel.font = [UIFont systemFontOfSize:15];
-  textLabel.text = message;
-  [view addSubview:textLabel];
-
-  if (icon) {
-    UIImageView *iconView = [[UIImageView alloc] initWithFrame:CGRectMake(marginH, statusBarHeight + (navigationBarHeight - iconLength) / 2, iconLength, iconLength)];
-    iconView.image = icon;
-    [view addSubview:iconView];
-
-    CGFloat adjust = iconLength + padding;
-    textLabelFrame.origin.x += adjust;
-    textLabelFrame.size.width -= adjust;
-    textLabel.frame = textLabelFrame;
-  }
+  UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+  [window addSubview:layout];
+  [window addConstraints:
+      [NSLayoutConstraint constraintsWithVisualFormat:@"|[layout]|"
+                                              options:NSLayoutFormatDirectionLeadingToTrailing
+                                              metrics:nil
+                                                views:NSDictionaryOfVariableBindings(layout)]];
+  [window addConstraint:
+      [NSLayoutConstraint constraintWithItem:layout
+                                   attribute:NSLayoutAttributeBottom
+                                   relatedBy:NSLayoutRelationEqual
+                                      toItem:window
+                                   attribute:NSLayoutAttributeTop
+                                  multiplier:1
+                                    constant:0]];
+  [window layoutIfNeeded];
 
   [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:0.6 initialSpringVelocity:0 options:0 animations:^{
-    CGRect targetFrame = originalFrame;
-    targetFrame.origin.y = 0;
-    view.frame = targetFrame;
+    CGRect target = layout.frame;
+    target.origin.y = -CGRectGetHeight(target) + layout.contentHeight;
+    layout.frame = target;
   }                completion:^(BOOL finished) {
-    [NSTimer scheduledTimerWithTimeInterval:1.7 target:[ZTDropDownNotification sharedInstance] selector:@selector(handleTimer:) userInfo:view repeats:NO];
+    [NSTimer scheduledTimerWithTimeInterval:1.7
+                                     target:[ZTDropDownNotification sharedInstance]
+                                   selector:@selector(handleDurationTimer:)
+                                   userInfo:layout
+                                    repeats:NO];
   }];
 }
 
-- (void)handleTimer:(NSTimer *)timer {
-  UIView *view = (UIView *) timer.userInfo;
+- (void)handleDurationTimer:(NSTimer *)timer {
+  UIView *layout = (UIView *) timer.userInfo;
   [UIView animateWithDuration:0.2 animations:^{
-    CGRect targetFrame = view.frame;
-    targetFrame.origin.y -= CGRectGetMaxY(targetFrame);
-    view.frame = targetFrame;
+    CGRect target = layout.frame;
+    target.origin.y = -CGRectGetHeight(target);
+    layout.frame = target;
   }                completion:^(BOOL finished) {
-    [view removeFromSuperview];
+    [layout removeFromSuperview];
   }];
 }
 

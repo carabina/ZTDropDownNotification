@@ -20,6 +20,6 @@
 }
 
 - (IBAction)notifyMessageOnly:(UIButton *)button {
-  [ZTDropDownNotification notifyMessage:@"Notify Message Only" withIcon:nil];
+  [ZTDropDownNotification notifyMessage:button.titleLabel.text withIcon:nil];
 }
 @end
