@@ -36,11 +36,11 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 }
 
 - (void)setupLabelView {
-  self.labelView = [UILabel new];
-  self.labelView.translatesAutoresizingMaskIntoConstraints = NO;
-  self.labelView.font = [UIFont systemFontOfSize:15];
-  self.labelView.textAlignment = NSTextAlignmentCenter;
-  [self addSubview:self.labelView];
+  UILabel *labelView = [UILabel new];
+  labelView.translatesAutoresizingMaskIntoConstraints = NO;
+  labelView.font = [UIFont systemFontOfSize:15];
+  labelView.textAlignment = NSTextAlignmentCenter;
+  [self addSubview:labelView];
 
   [self addConstraints:
       [NSLayoutConstraint constraintsWithVisualFormat:@"|-(margin)-[labelView]-(margin)-|"
@@ -48,10 +48,7 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
                                               metrics:@{
                                                   @"margin": @(HorizontalMargin),
                                               }
-                                                views:@{
-                                                    @"labelView": self.labelView
-                                                }]];
-
+                                                views:NSDictionaryOfVariableBindings(labelView)]];
   [self addConstraints:
       [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(margin)-[labelView(==height)]|"
                                               options:NSLayoutFormatDirectionLeadingToTrailing
@@ -59,9 +56,8 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
                                                   @"margin": @(StandardPadding + StatusBarHeight),
                                                   @"height": @(NavigationBarHeight)
                                               }
-                                                views:@{
-                                                    @"labelView": self.labelView
-                                                }]];
+                                                views:NSDictionaryOfVariableBindings(labelView)]];
+  self.labelView = labelView;
 }
 
 - (void)setIcon:(UIImage *_Nullable)icon {}
@@ -94,14 +90,14 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 }
 
 - (void)setupSubviews {
-  self.iconView = [UIImageView new];
-  self.iconView.translatesAutoresizingMaskIntoConstraints = NO;
-  [self addSubview:self.iconView];
+  UIImageView *iconView = [UIImageView new];
+  iconView.translatesAutoresizingMaskIntoConstraints = NO;
+  [self addSubview:iconView];
 
-  self.labelView = [UILabel new];
-  self.labelView.translatesAutoresizingMaskIntoConstraints = NO;
-  self.labelView.font = [UIFont systemFontOfSize:15];
-  [self addSubview:self.labelView];
+  UILabel *labelView = [UILabel new];
+  labelView.translatesAutoresizingMaskIntoConstraints = NO;
+  labelView.font = [UIFont systemFontOfSize:15];
+  [self addSubview:labelView];
 
   [self addConstraints:
       [NSLayoutConstraint constraintsWithVisualFormat:@"|-(margin)-[iconView]-(padding)-[labelView]-(margin)-|"
@@ -110,11 +106,8 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
                                                   @"margin": @(HorizontalMargin),
                                                   @"padding": @(StandardPadding),
                                               }
-                                                views:@{
-                                                    @"iconView": self.iconView,
-                                                    @"labelView": self.labelView
-                                                }]];
-  [self.iconView setContentHuggingPriority:251 forAxis:UILayoutConstraintAxisHorizontal];
+                                                views:NSDictionaryOfVariableBindings(iconView, labelView)]];
+  [iconView setContentHuggingPriority:251 forAxis:UILayoutConstraintAxisHorizontal];
   [self addConstraints:
       [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(margin)-[labelView(==height)]|"
                                               options:NSLayoutFormatDirectionLeadingToTrailing
@@ -122,9 +115,9 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
                                                   @"margin": @(StandardPadding + StatusBarHeight),
                                                   @"height": @(NavigationBarHeight)
                                               }
-                                                views:@{
-                                                    @"labelView": self.labelView
-                                                }]];
+                                                views:NSDictionaryOfVariableBindings(labelView)]];
+  self.iconView = iconView;
+  self.labelView = labelView;
 }
 
 - (void)setIcon:(UIImage *_Nullable)icon {
