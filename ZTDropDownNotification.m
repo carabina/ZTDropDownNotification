@@ -15,17 +15,11 @@ NSString *const _Nonnull ZTDropDownNotificationFailureIconKey = @"ZTDropDownNoti
 static const CGFloat HorizontalMargin = 12, StandardPadding = 8;
 static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 
-@protocol NotificationLayout
-@property(nonatomic, assign, readonly) CGFloat contentHeight;
-- (void)setIcon:(UIImage *)icon;
-- (void)setMessage:(NSString *)message;
-@end
-
-@interface TextOnlyLayout : UIView <NotificationLayout>
+@interface DefaultTextOnlyLayout : UIView <ZTDropDownNotificationLayout>
 @property(nonatomic) UILabel *labelView;
 @end
 
-@implementation TextOnlyLayout
+@implementation DefaultTextOnlyLayout
 - (instancetype)init {
   if (self = [super init]) {
     [self setupBackground];
@@ -70,9 +64,9 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
                                                 }]];
 }
 
-- (void)setIcon:(UIImage *)icon {}
+- (void)setIcon:(UIImage *_Nullable)icon {}
 
-- (void)setMessage:(NSString *)message {
+- (void)setMessage:(NSString *_Nonnull)message {
   self.labelView.text = message;
 }
 
@@ -81,7 +75,7 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 }
 @end
 
-@interface DefaultLayout : UIView <NotificationLayout>
+@interface DefaultLayout : UIView <ZTDropDownNotificationLayout>
 @property(nonatomic) UIImageView *iconView;
 @property(nonatomic) UILabel *labelView;
 @end
@@ -123,7 +117,7 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
                                                     @"iconView": self.iconView,
                                                     @"labelView": self.labelView
                                                 }]];
-
+  [self.iconView setContentHuggingPriority:251 forAxis:UILayoutConstraintAxisHorizontal];
   [self addConstraints:
       [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(margin)-[labelView(==height)]|"
                                               options:NSLayoutFormatDirectionLeadingToTrailing
@@ -136,12 +130,12 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
                                                 }]];
 }
 
-- (void)setIcon:(UIImage *)icon {
+- (void)setIcon:(UIImage *_Nullable)icon {
   NSAssert(icon, @"icon cannot be nil");
   self.iconView.image = icon;
 }
 
-- (void)setMessage:(NSString *)message {
+- (void)setMessage:(NSString *_Nonnull)message {
   self.labelView.text = message;
 }
 
@@ -152,6 +146,7 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 
 @interface ZTDropDownNotification ()
 @property(nonatomic) NSMutableDictionary<NSString *, UIImage *> *iconSets;
+@property(nonatomic) UIView <ZTDropDownNotificationLayout> *defaultLayout;
 @end
 
 @implementation ZTDropDownNotification
@@ -176,8 +171,12 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   [[ZTDropDownNotification sharedInstance].iconSets addEntriesFromDictionary:iconSets];
 }
 
++ (void)setDefaultLayout:(UIView <ZTDropDownNotificationLayout> *_Nullable)layout {
+  [ZTDropDownNotification sharedInstance].defaultLayout = layout;
+}
+
 + (void)notifyMessage:(NSString *_Nonnull)message withIconKey:(NSString *_Nullable)iconKey {
-  [ZTDropDownNotification notifyMessage:message withIcon:[ZTDropDownNotification iconSets][iconKey]];
+  [ZTDropDownNotification notifyMessage:message withIcon:[ZTDropDownNotification sharedInstance].iconSets[iconKey]];
 }
 
 + (void)notifyInfoMessage:(NSString *_Nonnull)message {
@@ -193,13 +192,27 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 }
 
 + (void)notifyMessage:(NSString *_Nonnull)message withIcon:(UIImage *_Nullable)icon {
-  NSAssert([NSThread isMainThread], @"[ZTDropDownNotification notifyMessage:withIcon:] should run in main thread");
+  UIView <ZTDropDownNotificationLayout> *layout = [ZTDropDownNotification sharedInstance].defaultLayout;
+  if (!layout) {
+    layout = icon ? [DefaultLayout new] : [DefaultTextOnlyLayout new];
+  }
+
+  [ZTDropDownNotification notifyMessage:message withIcon:icon usingLayout:layout];
+}
+
++ (void)notifyMessage:(NSString *_Nonnull)message withIcon:(UIImage *_Nullable)icon usingLayout:(UIView <ZTDropDownNotificationLayout> *_Nonnull)layout {
+  NSAssert([NSThread isMainThread], @"[ZTDropDownNotification notifyMessage:withIcon:usingLayout:] should run in main thread");
   NSAssert(message, @"message cannot be nil");
 
-  UIView <NotificationLayout> *layout = icon ? [DefaultLayout new] : [TextOnlyLayout new];
-  layout.translatesAutoresizingMaskIntoConstraints = NO;
   [layout setMessage:message];
   [layout setIcon:icon];
+
+  [ZTDropDownNotification addLayoutToKeyWindow:layout];
+  [ZTDropDownNotification showNotificationView:layout];
+}
+
++ (void)addLayoutToKeyWindow:(UIView <ZTDropDownNotificationLayout> *)layout {
+  layout.translatesAutoresizingMaskIntoConstraints = NO;
 
   UIWindow *window = [[UIApplication sharedApplication] keyWindow];
   [window addSubview:layout];
@@ -217,32 +230,33 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
                                   multiplier:1
                                     constant:0]];
   [window layoutIfNeeded];
+}
 
++ (void)showNotificationView:(UIView <ZTDropDownNotificationLayout> *)view {
   [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:0.6 initialSpringVelocity:0 options:0 animations:^{
-    CGRect target = layout.frame;
-    target.origin.y = -CGRectGetHeight(target) + layout.contentHeight;
-    layout.frame = target;
+    CGRect target = view.frame;
+    target.origin.y = -CGRectGetHeight(target) + view.contentHeight;
+    view.frame = target;
   }                completion:^(BOOL finished) {
     [NSTimer scheduledTimerWithTimeInterval:1.7
                                      target:[ZTDropDownNotification sharedInstance]
                                    selector:@selector(handleDurationTimer:)
-                                   userInfo:layout
+                                   userInfo:view
                                     repeats:NO];
   }];
 }
 
-- (void)handleDurationTimer:(NSTimer *)timer {
-  UIView *layout = (UIView *) timer.userInfo;
++ (void)hideNotificationView:(UIView *)view {
   [UIView animateWithDuration:0.2 animations:^{
-    CGRect target = layout.frame;
+    CGRect target = view.frame;
     target.origin.y = -CGRectGetHeight(target);
-    layout.frame = target;
+    view.frame = target;
   }                completion:^(BOOL finished) {
-    [layout removeFromSuperview];
+    [view removeFromSuperview];
   }];
 }
 
-+ (NSMutableDictionary<NSString *, UIImage *> *)iconSets {
-  return [[ZTDropDownNotification sharedInstance] iconSets];
+- (void)handleDurationTimer:(NSTimer *)timer {
+  [ZTDropDownNotification hideNotificationView:(UIView *) timer.userInfo];
 }
 @end

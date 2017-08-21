@@ -9,6 +9,8 @@
 #import "ViewController.h"
 #import "ZTDropDownNotification.h"
 
+static NSString *const NotificationRegisteredIconKey = @"NotificationRegisteredIconKey";
+
 @interface ViewController ()
 
 @end
@@ -17,9 +19,25 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
+
+  [ZTDropDownNotification registerIconSets:@{
+      NotificationRegisteredIconKey: [UIImage imageNamed:@"registered_blue"],
+      ZTDropDownNotificationSuccessIconKey: [UIImage imageNamed:@"check_green"]}];
 }
 
 - (IBAction)notifyMessageOnly:(UIButton *)button {
   [ZTDropDownNotification notifyMessage:button.titleLabel.text withIcon:nil];
+}
+
+- (IBAction)notifySuccessMessage:(UIButton *)button {
+  [ZTDropDownNotification notifySuccessMessage:button.titleLabel.text];
+}
+
+- (IBAction)notifyMessageWithRegisteredIcon:(UIButton *)button {
+  [ZTDropDownNotification notifyMessage:button.titleLabel.text withIconKey:NotificationRegisteredIconKey];
+}
+
+- (IBAction)notifyMessageWithIconOnce:(UIButton *)button {
+  [ZTDropDownNotification notifyMessage:button.titleLabel.text withIcon:[UIImage imageNamed:@"thumbs_up_blue"]];
 }
 @end
