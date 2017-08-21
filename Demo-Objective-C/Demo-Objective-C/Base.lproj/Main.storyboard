@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="yyq-h8-UCk">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="yyq-h8-UCk">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -22,42 +23,61 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rhv-Uo-g5N">
-                                <rect key="frame" x="115.5" y="84" width="143" height="30"/>
+                                <rect key="frame" x="115.5" y="164" width="143" height="30"/>
                                 <state key="normal" title="Notify Message Only"/>
                                 <connections>
                                     <action selector="notifyMessageOnly:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Bom-D6-jrq"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J09-BC-N2z">
-                                <rect key="frame" x="102.5" y="122" width="169" height="30"/>
+                                <rect key="frame" x="102.5" y="202" width="169" height="30"/>
                                 <state key="normal" title="Notify Success Message"/>
                                 <connections>
                                     <action selector="notifySuccessMessage:" destination="BYZ-38-t0r" eventType="touchUpInside" id="kvS-b6-p7M"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mrw-29-edI">
-                                <rect key="frame" x="60" y="160" width="254" height="30"/>
+                                <rect key="frame" x="60" y="240" width="254" height="30"/>
                                 <state key="normal" title="Notify Message With Registered Icon"/>
                                 <connections>
                                     <action selector="notifyMessageWithRegisteredIcon:" destination="BYZ-38-t0r" eventType="touchUpInside" id="buX-qx-51A"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Is-7f-PyR">
-                                <rect key="frame" x="79" y="198" width="216" height="30"/>
+                                <rect key="frame" x="79" y="278" width="216" height="30"/>
                                 <state key="normal" title="Notify Message With Icon Once"/>
                                 <connections>
                                     <action selector="notifyMessageWithIconOnce:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Enk-c0-8gG"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ipL-JR-Ywp">
+                                <rect key="frame" x="16" y="316" width="131" height="30"/>
+                                <state key="normal" title="Set Custom Layout"/>
+                                <connections>
+                                    <action selector="setCustomDefaultLayout:" destination="BYZ-38-t0r" eventType="touchUpInside" id="7di-Jh-byx"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="749" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="txW-Fl-4v0">
+                                <rect key="frame" x="216" y="316" width="143" height="30"/>
+                                <state key="normal" title="Reset Built-In Layout"/>
+                                <connections>
+                                    <action selector="resetLayoutToBuiltIns:" destination="BYZ-38-t0r" eventType="touchUpInside" id="7Sv-zz-l0b"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="rhv-Uo-g5N" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="20" id="CGK-f0-Z82"/>
+                            <constraint firstItem="ipL-JR-Ywp" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="BCM-t5-cXt"/>
+                            <constraint firstItem="rhv-Uo-g5N" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="100" id="CGK-f0-Z82"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="txW-Fl-4v0" secondAttribute="trailing" id="GGz-3F-rhG"/>
+                            <constraint firstItem="Mrw-29-edI" firstAttribute="top" secondItem="J09-BC-N2z" secondAttribute="bottom" constant="8" symbolic="YES" id="Oie-jv-UCQ"/>
+                            <constraint firstItem="ipL-JR-Ywp" firstAttribute="top" secondItem="6Is-7f-PyR" secondAttribute="bottom" constant="8" symbolic="YES" id="PM6-yb-kdp"/>
                             <constraint firstItem="Mrw-29-edI" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Vfz-z0-VWI"/>
-                            <constraint firstItem="J09-BC-N2z" firstAttribute="top" secondItem="rhv-Uo-g5N" secondAttribute="bottom" constant="8" id="WRq-mX-Pqu"/>
-                            <constraint firstItem="Mrw-29-edI" firstAttribute="top" secondItem="J09-BC-N2z" secondAttribute="bottom" constant="8" id="e09-Ts-XP1"/>
-                            <constraint firstItem="6Is-7f-PyR" firstAttribute="top" secondItem="Mrw-29-edI" secondAttribute="bottom" constant="8" id="ef0-NS-DY4"/>
+                            <constraint firstItem="txW-Fl-4v0" firstAttribute="top" secondItem="6Is-7f-PyR" secondAttribute="bottom" constant="8" symbolic="YES" id="dKl-Ol-iGq"/>
+                            <constraint firstItem="6Is-7f-PyR" firstAttribute="top" secondItem="Mrw-29-edI" secondAttribute="bottom" constant="8" symbolic="YES" id="hZR-Dm-WVP"/>
                             <constraint firstItem="6Is-7f-PyR" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="pOS-LB-MpM"/>
+                            <constraint firstItem="J09-BC-N2z" firstAttribute="top" secondItem="rhv-Uo-g5N" secondAttribute="bottom" constant="8" symbolic="YES" id="tbx-SS-gi1"/>
+                            <constraint firstItem="txW-Fl-4v0" firstAttribute="centerY" secondItem="ipL-JR-Ywp" secondAttribute="centerY" id="uPz-zq-0aM"/>
                             <constraint firstItem="rhv-Uo-g5N" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="ugZ-nq-Nut"/>
                             <constraint firstItem="J09-BC-N2z" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="wbE-W3-lU0"/>
                         </constraints>

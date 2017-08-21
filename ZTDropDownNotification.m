@@ -107,7 +107,15 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
                                                   @"padding": @(StandardPadding),
                                               }
                                                 views:NSDictionaryOfVariableBindings(iconView, labelView)]];
-  [iconView setContentHuggingPriority:251 forAxis:UILayoutConstraintAxisHorizontal];
+  [iconView setContentHuggingPriority:UILayoutPriorityDefaultLow + 1 forAxis:UILayoutConstraintAxisHorizontal];
+  [self addConstraint:
+      [NSLayoutConstraint constraintWithItem:iconView
+                                   attribute:NSLayoutAttributeHeight
+                                   relatedBy:NSLayoutRelationLessThanOrEqual
+                                      toItem:nil
+                                   attribute:NSLayoutAttributeNotAnAttribute
+                                  multiplier:1
+                                    constant:NavigationBarHeight]];
   [self addConstraints:
       [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(margin)-[labelView(==height)]|"
                                               options:NSLayoutFormatDirectionLeadingToTrailing
@@ -204,10 +212,20 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   UIWindow *window = [[UIApplication sharedApplication] keyWindow];
   [window addSubview:layout];
   [window addConstraints:
-      [NSLayoutConstraint constraintsWithVisualFormat:@"|[layout]|"
+      [NSLayoutConstraint constraintsWithVisualFormat:@"|-(0@priority)-[layout]-(0@priority)-|"
                                               options:NSLayoutFormatDirectionLeadingToTrailing
-                                              metrics:nil
+                                              metrics:@{
+                                                  @"priority": @(UILayoutPriorityRequired - 1)
+                                              }
                                                 views:NSDictionaryOfVariableBindings(layout)]];
+  [window addConstraint:
+      [NSLayoutConstraint constraintWithItem:layout
+                                   attribute:NSLayoutAttributeCenterX
+                                   relatedBy:NSLayoutRelationEqual
+                                      toItem:window
+                                   attribute:NSLayoutAttributeCenterX
+                                  multiplier:1
+                                    constant:0]];
   [window addConstraint:
       [NSLayoutConstraint constraintWithItem:layout
                                    attribute:NSLayoutAttributeBottom

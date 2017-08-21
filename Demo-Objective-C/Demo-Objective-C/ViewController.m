@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "ZTDropDownNotification.h"
+#import "CustomRectangleLayout.h"
 
 static NSString *const NotificationRegisteredIconKey = @"NotificationRegisteredIconKey";
 
@@ -39,5 +40,13 @@ static NSString *const NotificationRegisteredIconKey = @"NotificationRegisteredI
 
 - (IBAction)notifyMessageWithIconOnce:(UIButton *)button {
   [ZTDropDownNotification notifyMessage:button.titleLabel.text withIcon:[UIImage imageNamed:@"thumbs_up_blue"]];
+}
+
+- (IBAction)setCustomDefaultLayout:(UIButton *)button {
+  [ZTDropDownNotification setDefaultLayout:[CustomRectangleLayout new]];
+}
+
+- (IBAction)resetLayoutToBuiltIns:(UIButton *)button {
+  [ZTDropDownNotification setDefaultLayout:nil];
 }
 @end

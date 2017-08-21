@@ -11,9 +11,10 @@
 		D4101A6F1F4479BC00444A27 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D4101A6E1F4479BC00444A27 /* AppDelegate.m */; };
 		D4101A721F4479BC00444A27 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D4101A711F4479BC00444A27 /* ViewController.m */; };
 		D4101A751F4479BC00444A27 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4101A731F4479BC00444A27 /* Main.storyboard */; };
-		D4101A771F4479BC00444A27 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4101A761F4479BC00444A27 /* Assets.xcassets */; };
 		D4101A7A1F4479BC00444A27 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4101A781F4479BC00444A27 /* LaunchScreen.storyboard */; };
 		D4101A851F447C8200444A27 /* ZTDropDownNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = D4101A841F447C8200444A27 /* ZTDropDownNotification.m */; };
+		D4FB9B551F4AD38900D980C8 /* CustomRectangleLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = D4FB9B541F4AD38900D980C8 /* CustomRectangleLayout.m */; };
+		D4FB9B571F4ADCB600D980C8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4FB9B561F4ADCB600D980C8 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,11 +25,13 @@
 		D4101A701F4479BC00444A27 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		D4101A711F4479BC00444A27 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		D4101A741F4479BC00444A27 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		D4101A761F4479BC00444A27 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D4101A791F4479BC00444A27 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D4101A7B1F4479BC00444A27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4101A831F447C8200444A27 /* ZTDropDownNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZTDropDownNotification.h; path = ../ZTDropDownNotification.h; sourceTree = "<group>"; };
 		D4101A841F447C8200444A27 /* ZTDropDownNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZTDropDownNotification.m; path = ../ZTDropDownNotification.m; sourceTree = "<group>"; };
+		D4FB9B531F4AD38900D980C8 /* CustomRectangleLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomRectangleLayout.h; sourceTree = "<group>"; };
+		D4FB9B541F4AD38900D980C8 /* CustomRectangleLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomRectangleLayout.m; sourceTree = "<group>"; };
+		D4FB9B561F4ADCB600D980C8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,11 +67,13 @@
 			children = (
 				D4101A6D1F4479BC00444A27 /* AppDelegate.h */,
 				D4101A6E1F4479BC00444A27 /* AppDelegate.m */,
+				D4FB9B531F4AD38900D980C8 /* CustomRectangleLayout.h */,
+				D4FB9B541F4AD38900D980C8 /* CustomRectangleLayout.m */,
 				D4101A701F4479BC00444A27 /* ViewController.h */,
 				D4101A711F4479BC00444A27 /* ViewController.m */,
 				D4101A731F4479BC00444A27 /* Main.storyboard */,
-				D4101A761F4479BC00444A27 /* Assets.xcassets */,
 				D4101A781F4479BC00444A27 /* LaunchScreen.storyboard */,
+				D4FB9B561F4ADCB600D980C8 /* Assets.xcassets */,
 				D4101A7B1F4479BC00444A27 /* Info.plist */,
 				D4101A6A1F4479BC00444A27 /* Supporting Files */,
 			);
@@ -152,7 +157,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4101A7A1F4479BC00444A27 /* LaunchScreen.storyboard in Resources */,
-				D4101A771F4479BC00444A27 /* Assets.xcassets in Resources */,
+				D4FB9B571F4ADCB600D980C8 /* Assets.xcassets in Resources */,
 				D4101A751F4479BC00444A27 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -167,6 +172,7 @@
 				D4101A721F4479BC00444A27 /* ViewController.m in Sources */,
 				D4101A851F447C8200444A27 /* ZTDropDownNotification.m in Sources */,
 				D4101A6F1F4479BC00444A27 /* AppDelegate.m in Sources */,
+				D4FB9B551F4AD38900D980C8 /* CustomRectangleLayout.m in Sources */,
 				D4101A6C1F4479BC00444A27 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -328,6 +334,7 @@
 				D4101A801F4479BC00444A27 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
