@@ -14,9 +14,10 @@ extern NSString *const _Nonnull ZTDropDownNotificationSuccessIconKey;
 extern NSString *const _Nonnull ZTDropDownNotificationFailureIconKey;
 
 @protocol ZTDropDownNotificationLayout
-@property(nonatomic, assign, readonly) CGFloat contentHeight;
 - (void)setIcon:(UIImage *_Nullable)icon;
 - (void)setMessage:(NSString *_Nonnull)message;
+@optional
+@property(nonatomic, assign, readonly) CGFloat topPadding;
 @end
 
 @interface ZTDropDownNotification : NSObject

@@ -70,9 +70,6 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   self.labelView.text = message;
 }
 
-- (CGFloat)contentHeight {
-  return StatusBarHeight + NavigationBarHeight;
-}
 @end
 
 @interface DefaultLayout : UIView <ZTDropDownNotificationLayout>
@@ -139,9 +136,6 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   self.labelView.text = message;
 }
 
-- (CGFloat)contentHeight {
-  return StatusBarHeight + NavigationBarHeight;
-}
 @end
 
 @interface ZTDropDownNotification ()
@@ -235,7 +229,7 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 + (void)showNotificationView:(UIView <ZTDropDownNotificationLayout> *)view {
   [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:0.6 initialSpringVelocity:0 options:0 animations:^{
     CGRect target = view.frame;
-    target.origin.y = -CGRectGetHeight(target) + view.contentHeight;
+    target.origin.y = [view respondsToSelector:@selector(topPadding)] ? -view.topPadding : -StandardPadding;
     view.frame = target;
   }                completion:^(BOOL finished) {
     [NSTimer scheduledTimerWithTimeInterval:1.7
