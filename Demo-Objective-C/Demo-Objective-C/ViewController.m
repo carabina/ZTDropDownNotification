@@ -43,12 +43,57 @@ static NSString *const NotificationRegisteredIconKey = @"NotificationRegisteredI
 }
 
 - (IBAction)setCustomDefaultLayout:(UIButton *)button {
-  [ZTDropDownNotification setDefaultLayoutGenerator:^UIView<ZTNLayout>*{
+  [ZTDropDownNotification setDefaultLayoutGenerator:^UIView <ZTNLayout> * {
     return [CustomRectangleLayout new];
   }];
 }
 
 - (IBAction)resetLayoutToBuiltIns:(UIButton *)button {
   [ZTDropDownNotification setDefaultLayoutGenerator:nil];
+}
+
+- (IBAction)notifyCustomTemporaryView:(UIButton *)button {
+  UIView *view = [UIView new];
+  view.translatesAutoresizingMaskIntoConstraints = NO;
+  view.backgroundColor = [UIColor whiteColor];
+  view.layer.cornerRadius = 5.0;
+  view.layer.shadowOffset = CGSizeMake(0, 1);
+  view.layer.shadowRadius = 5.0;
+  view.layer.shadowOpacity = 0.9;
+  [view addConstraint:
+      [NSLayoutConstraint constraintWithItem:view
+                                   attribute:NSLayoutAttributeWidth
+                                   relatedBy:NSLayoutRelationEqual
+                                      toItem:nil
+                                   attribute:NSLayoutAttributeNotAnAttribute
+                                  multiplier:1
+                                    constant:CGRectGetWidth([UIScreen mainScreen].bounds) * 0.6f]];
+
+  UILabel *label = [UILabel new];
+  label.translatesAutoresizingMaskIntoConstraints = NO;
+  label.textColor = [UIColor orangeColor];
+  label.text = button.titleLabel.text;
+  label.shadowOffset = CGSizeMake(1, 0);
+  label.shadowColor = [UIColor lightGrayColor];
+  [view addSubview:label];
+
+  UIImageView *icon = [UIImageView new];
+  icon.translatesAutoresizingMaskIntoConstraints = NO;
+  icon.image = [UIImage imageNamed:@"check_green"];
+  [view addSubview:icon];
+
+  [view addConstraints:
+      [NSLayoutConstraint constraintsWithVisualFormat:@"|-[label]-[icon]-|"
+                                              options:NSLayoutFormatAlignAllCenterY
+                                              metrics:nil
+                                                views:NSDictionaryOfVariableBindings(label, icon)]];
+  [view addConstraints:
+      [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(28)-[label(==44)]|"
+                                              options:NSLayoutFormatDirectionLeadingToTrailing
+                                              metrics:nil
+                                                views:NSDictionaryOfVariableBindings(label)]];
+  [icon setContentHuggingPriority:UILayoutPriorityDefaultLow + 1 forAxis:UILayoutConstraintAxisHorizontal];
+
+  [ZTDropDownNotification notifyView:view];
 }
 @end

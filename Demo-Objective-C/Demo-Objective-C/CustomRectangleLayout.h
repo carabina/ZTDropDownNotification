@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 #import "ZTDropDownNotification.h"
 
-@interface CustomRectangleLayout : UIView<ZTNLayout>
+@interface CustomRectangleLayout : UIView <ZTNLayout>
 @end

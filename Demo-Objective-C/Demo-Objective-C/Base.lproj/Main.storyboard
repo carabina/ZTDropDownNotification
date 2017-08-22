@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="yyq-h8-UCk">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="yyq-h8-UCk">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -64,6 +64,13 @@
                                     <action selector="resetLayoutToBuiltIns:" destination="BYZ-38-t0r" eventType="touchUpInside" id="7Sv-zz-l0b"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tsw-95-rAR">
+                                <rect key="frame" x="80" y="354" width="214" height="30"/>
+                                <state key="normal" title="Notify Custom Temporary View"/>
+                                <connections>
+                                    <action selector="notifyCustomTemporaryView:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hbP-cx-Hde"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -72,7 +79,9 @@
                             <constraint firstAttribute="trailingMargin" secondItem="txW-Fl-4v0" secondAttribute="trailing" id="GGz-3F-rhG"/>
                             <constraint firstItem="Mrw-29-edI" firstAttribute="top" secondItem="J09-BC-N2z" secondAttribute="bottom" constant="8" symbolic="YES" id="Oie-jv-UCQ"/>
                             <constraint firstItem="ipL-JR-Ywp" firstAttribute="top" secondItem="6Is-7f-PyR" secondAttribute="bottom" constant="8" symbolic="YES" id="PM6-yb-kdp"/>
+                            <constraint firstItem="Tsw-95-rAR" firstAttribute="top" secondItem="ipL-JR-Ywp" secondAttribute="bottom" constant="8" symbolic="YES" id="SMn-zh-sOo"/>
                             <constraint firstItem="Mrw-29-edI" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Vfz-z0-VWI"/>
+                            <constraint firstItem="Tsw-95-rAR" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="bzE-dh-4rr"/>
                             <constraint firstItem="txW-Fl-4v0" firstAttribute="top" secondItem="6Is-7f-PyR" secondAttribute="bottom" constant="8" symbolic="YES" id="dKl-Ol-iGq"/>
                             <constraint firstItem="6Is-7f-PyR" firstAttribute="top" secondItem="Mrw-29-edI" secondAttribute="bottom" constant="8" symbolic="YES" id="hZR-Dm-WVP"/>
                             <constraint firstItem="6Is-7f-PyR" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="pOS-LB-MpM"/>
