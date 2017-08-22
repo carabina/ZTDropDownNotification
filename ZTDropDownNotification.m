@@ -8,14 +8,14 @@
 
 #import "ZTDropDownNotification.h"
 
-NSString *const _Nonnull ZTDropDownNotificationInfoIconKey = @"ZTDropDownNotificationInfoIconKey";
-NSString *const _Nonnull ZTDropDownNotificationSuccessIconKey = @"ZTDropDownNotificationSuccessIconKey";
-NSString *const _Nonnull ZTDropDownNotificationFailureIconKey = @"ZTDropDownNotificationFailureIconKey";
+NSString *const _Nonnull ZTNInfoIconKey = @"ZTNInfoIconKey";
+NSString *const _Nonnull ZTNSuccessIconKey = @"ZTNSuccessIconKey";
+NSString *const _Nonnull ZTNFailureIconKey = @"ZTNFailureIconKey";
 
 static const CGFloat HorizontalMargin = 12, StandardPadding = 8;
 static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 
-@interface DefaultTextOnlyLayout : UIView <ZTDropDownNotificationLayout>
+@interface DefaultTextOnlyLayout : UIView <ZTNLayout>
 @property(nonatomic) UILabel *labelView;
 @end
 
@@ -68,7 +68,7 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 
 @end
 
-@interface DefaultLayout : UIView <ZTDropDownNotificationLayout>
+@interface DefaultLayout : UIView <ZTNLayout>
 @property(nonatomic) UIImageView *iconView;
 @property(nonatomic) UILabel *labelView;
 @end
@@ -141,7 +141,9 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 
 @interface ZTDropDownNotification ()
 @property(nonatomic) NSMutableDictionary<NSString *, UIImage *> *iconSets;
-@property(nonatomic) UIView <ZTDropDownNotificationLayout> *defaultLayout;
+@property(nonatomic) NSMutableArray *queue;
+@property(nonatomic, copy) ZTNLayoutGeneratorBlock defaultLayoutGenerator;
+@property(nonatomic, assign) BOOL showing;
 @end
 
 @implementation ZTDropDownNotification
@@ -158,6 +160,9 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 - (instancetype)init {
   if (self = [super init]) {
     _iconSets = [NSMutableDictionary new];
+    _queue = [NSMutableArray new];
+    _defaultLayoutGenerator = nil;
+    _showing = NO;
   }
   return self;
 }
@@ -166,8 +171,8 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   [[ZTDropDownNotification sharedInstance].iconSets addEntriesFromDictionary:iconSets];
 }
 
-+ (void)setDefaultLayout:(UIView <ZTDropDownNotificationLayout> *_Nullable)layout {
-  [ZTDropDownNotification sharedInstance].defaultLayout = layout;
++ (void)setDefaultLayoutGenerator:(ZTNLayoutGeneratorBlock _Nullable)generator {
+  [ZTDropDownNotification sharedInstance].defaultLayoutGenerator = generator;
 }
 
 + (void)notifyMessage:(NSString *_Nonnull)message withIconKey:(NSString *_Nullable)iconKey {
@@ -175,38 +180,47 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 }
 
 + (void)notifyInfoMessage:(NSString *_Nonnull)message {
-  [ZTDropDownNotification notifyMessage:message withIconKey:ZTDropDownNotificationInfoIconKey];
+  [ZTDropDownNotification notifyMessage:message withIconKey:ZTNInfoIconKey];
 }
 
 + (void)notifySuccessMessage:(NSString *_Nonnull)message {
-  [ZTDropDownNotification notifyMessage:message withIconKey:ZTDropDownNotificationSuccessIconKey];
+  [ZTDropDownNotification notifyMessage:message withIconKey:ZTNSuccessIconKey];
 }
 
 + (void)notifyFailureMessage:(NSString *_Nonnull)message {
-  [ZTDropDownNotification notifyMessage:message withIconKey:ZTDropDownNotificationFailureIconKey];
+  [ZTDropDownNotification notifyMessage:message withIconKey:ZTNFailureIconKey];
 }
 
 + (void)notifyMessage:(NSString *_Nonnull)message withIcon:(UIImage *_Nullable)icon {
-  UIView <ZTDropDownNotificationLayout> *layout = [ZTDropDownNotification sharedInstance].defaultLayout;
-  if (!layout) {
+  NSAssert(message, @"message cannot be nil");
+  UIView <ZTNLayout> *layout;
+  if ([ZTDropDownNotification sharedInstance].defaultLayoutGenerator) {
+    layout = [ZTDropDownNotification sharedInstance].defaultLayoutGenerator();
+  } else {
     layout = icon ? [DefaultLayout new] : [DefaultTextOnlyLayout new];
   }
-
-  [ZTDropDownNotification notifyMessage:message withIcon:icon usingLayout:layout];
-}
-
-+ (void)notifyMessage:(NSString *_Nonnull)message withIcon:(UIImage *_Nullable)icon usingLayout:(UIView <ZTDropDownNotificationLayout> *_Nonnull)layout {
-  NSAssert([NSThread isMainThread], @"[ZTDropDownNotification notifyMessage:withIcon:usingLayout:] should run in main thread");
-  NSAssert(message, @"message cannot be nil");
-
   [layout setMessage:message];
   [layout setIcon:icon];
 
-  [ZTDropDownNotification addLayoutToKeyWindow:layout];
-  [ZTDropDownNotification showNotificationView:layout];
+  [ZTDropDownNotification notifyView:layout];
 }
 
-+ (void)addLayoutToKeyWindow:(UIView <ZTDropDownNotificationLayout> *)layout {
++ (void)notifyView:(UIView *_Nonnull)view {
+  NSAssert([NSThread isMainThread], @"[ZTDropDownNotification notifyView:] should run in main thread");
+
+  if ([ZTDropDownNotification sharedInstance].showing) {
+    [[ZTDropDownNotification sharedInstance].queue addObject:view];
+  } else {
+    [ZTDropDownNotification notifyViewDirectly:view];
+  }
+}
+
++ (void)notifyViewDirectly:(UIView *)view {
+  [ZTDropDownNotification addLayoutToKeyWindow:view];
+  [ZTDropDownNotification showNotificationView:view];
+}
+
++ (void)addLayoutToKeyWindow:(UIView *)layout {
   layout.translatesAutoresizingMaskIntoConstraints = NO;
 
   UIWindow *window = [[UIApplication sharedApplication] keyWindow];
@@ -237,10 +251,11 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   [window layoutIfNeeded];
 }
 
-+ (void)showNotificationView:(UIView <ZTDropDownNotificationLayout> *)view {
++ (void)showNotificationView:(UIView *)view {
+  [ZTDropDownNotification sharedInstance].showing = YES;
   [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:0.6 initialSpringVelocity:0 options:0 animations:^{
     CGRect target = view.frame;
-    target.origin.y = [view respondsToSelector:@selector(topPadding)] ? -view.topPadding : -StandardPadding;
+    target.origin.y = -StandardPadding;
     view.frame = target;
   }                completion:^(BOOL finished) {
     [NSTimer scheduledTimerWithTimeInterval:1.7
@@ -258,6 +273,13 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
     view.frame = target;
   }                completion:^(BOOL finished) {
     [view removeFromSuperview];
+    if ([ZTDropDownNotification sharedInstance].queue.count > 0) {
+      UIView <ZTNLayout> *layout = [ZTDropDownNotification sharedInstance].queue.firstObject;
+      [[ZTDropDownNotification sharedInstance].queue removeObjectAtIndex:0];
+      [ZTDropDownNotification notifyViewDirectly:layout];
+    } else {
+      [ZTDropDownNotification sharedInstance].showing = NO;
+    }
   }];
 }
 
