@@ -21,7 +21,7 @@ static NSString *const NotificationRegisteredIconKey = @"NotificationRegisteredI
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  [ZTDropDownNotification registerIconSets:@{
+  [ZTDropDownNotification registerIcons:@{
       NotificationRegisteredIconKey: [UIImage imageNamed:@"registered_blue"],
       ZTNSuccessIconKey: [UIImage imageNamed:@"check_green"]}];
 }
@@ -42,14 +42,14 @@ static NSString *const NotificationRegisteredIconKey = @"NotificationRegisteredI
   [ZTDropDownNotification notifyMessage:button.titleLabel.text withIcon:[UIImage imageNamed:@"thumbs_up_blue"]];
 }
 
-- (IBAction)setCustomDefaultLayout:(UIButton *)button {
-  [ZTDropDownNotification setDefaultLayoutGenerator:^UIView <ZTNLayout> * {
+- (IBAction)setCustomLayout:(UIButton *)button {
+  [ZTDropDownNotification setCustomLayoutGenerator:^UIView <ZTNLayout> * {
     return [CustomRectangleLayout new];
   }];
 }
 
 - (IBAction)resetLayoutToBuiltIns:(UIButton *)button {
-  [ZTDropDownNotification setDefaultLayoutGenerator:nil];
+  [ZTDropDownNotification setCustomLayoutGenerator:nil];
 }
 
 - (IBAction)notifyCustomTemporaryView:(UIButton *)button {

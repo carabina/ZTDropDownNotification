@@ -141,8 +141,8 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 
 @interface ZTDropDownNotification ()
 @property(nonatomic) NSMutableDictionary<NSString *, UIImage *> *iconSets;
-@property(nonatomic) NSMutableArray *queue;
-@property(nonatomic, copy) ZTNLayoutGeneratorBlock defaultLayoutGenerator;
+@property(nonatomic) NSMutableArray<UIView *> *queue;
+@property(nonatomic, copy) ZTNLayoutGeneratorBlock customLayoutGenerator;
 @property(nonatomic, assign) BOOL showing;
 @end
 
@@ -161,18 +161,18 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   if (self = [super init]) {
     _iconSets = [NSMutableDictionary new];
     _queue = [NSMutableArray new];
-    _defaultLayoutGenerator = nil;
+    _customLayoutGenerator = nil;
     _showing = NO;
   }
   return self;
 }
 
-+ (void)registerIconSets:(NSDictionary<NSString *, UIImage *> *)iconSets {
-  [[ZTDropDownNotification sharedInstance].iconSets addEntriesFromDictionary:iconSets];
++ (void)registerIcons:(NSDictionary<NSString *, UIImage *> *_Nonnull)icons {
+  [[ZTDropDownNotification sharedInstance].iconSets addEntriesFromDictionary:icons];
 }
 
-+ (void)setDefaultLayoutGenerator:(ZTNLayoutGeneratorBlock _Nullable)generator {
-  [ZTDropDownNotification sharedInstance].defaultLayoutGenerator = generator;
++ (void)setCustomLayoutGenerator:(ZTNLayoutGeneratorBlock _Nullable)generator {
+  [ZTDropDownNotification sharedInstance].customLayoutGenerator = generator;
 }
 
 + (void)notifyMessage:(NSString *_Nonnull)message withIconKey:(NSString *_Nullable)iconKey {
@@ -194,8 +194,8 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 + (void)notifyMessage:(NSString *_Nonnull)message withIcon:(UIImage *_Nullable)icon {
   NSAssert(message, @"message cannot be nil");
   UIView <ZTNLayout> *layout;
-  if ([ZTDropDownNotification sharedInstance].defaultLayoutGenerator) {
-    layout = [ZTDropDownNotification sharedInstance].defaultLayoutGenerator();
+  if ([ZTDropDownNotification sharedInstance].customLayoutGenerator) {
+    layout = [ZTDropDownNotification sharedInstance].customLayoutGenerator();
   } else {
     layout = icon ? [DefaultLayout new] : [DefaultTextOnlyLayout new];
   }
@@ -226,6 +226,7 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   UIWindow *window = [[UIApplication sharedApplication] keyWindow];
   [window addSubview:layout];
   [window addConstraints:
+      // If layout has required priority constraints on its width, follow it, otherwise expand its leading and trailing edge to window width.
       [NSLayoutConstraint constraintsWithVisualFormat:@"|-(0@priority)-[layout]-(0@priority)-|"
                                               options:NSLayoutFormatDirectionLeadingToTrailing
                                               metrics:@{
@@ -255,6 +256,8 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   [ZTDropDownNotification sharedInstance].showing = YES;
   [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:0.6 initialSpringVelocity:0 options:0 animations:^{
     CGRect target = view.frame;
+    // To avoid the spring animation on top edge, set the target origin y above 0.
+    // TODO: Find a better solution to work around it.
     target.origin.y = -StandardPadding;
     view.frame = target;
   }                completion:^(BOOL finished) {
@@ -274,7 +277,7 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   }                completion:^(BOOL finished) {
     [view removeFromSuperview];
     if ([ZTDropDownNotification sharedInstance].queue.count > 0) {
-      UIView <ZTNLayout> *layout = [ZTDropDownNotification sharedInstance].queue.firstObject;
+      UIView *layout = [ZTDropDownNotification sharedInstance].queue.firstObject;
       [[ZTDropDownNotification sharedInstance].queue removeObjectAtIndex:0];
       [ZTDropDownNotification notifyViewDirectly:layout];
     } else {
