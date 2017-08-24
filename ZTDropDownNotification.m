@@ -17,11 +17,14 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 
 @interface DefaultTextOnlyLayout : UIView <ZTNLayout>
 @property(nonatomic) UILabel *labelView;
+@property(nonatomic) NSLayoutConstraint *topMargin;
+@property(nonatomic, assign) BOOL hasAddedConstraints;
 @end
 
 @implementation DefaultTextOnlyLayout
 - (instancetype)init {
   if (self = [super init]) {
+    _hasAddedConstraints = NO;
     [self setupBackground];
     [self setupLabelView];
   }
@@ -42,22 +45,36 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   labelView.textAlignment = NSTextAlignmentCenter;
   [self addSubview:labelView];
 
-  [self addConstraints:
-      [NSLayoutConstraint constraintsWithVisualFormat:@"|-(margin)-[labelView]-(margin)-|"
-                                              options:NSLayoutFormatAlignAllCenterY
-                                              metrics:@{
-                                                  @"margin": @(HorizontalMargin),
-                                              }
-                                                views:NSDictionaryOfVariableBindings(labelView)]];
-  [self addConstraints:
-      [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(margin)-[labelView(==height)]|"
-                                              options:NSLayoutFormatDirectionLeadingToTrailing
-                                              metrics:@{
-                                                  @"margin": @(StandardPadding + StatusBarHeight),
-                                                  @"height": @(NavigationBarHeight)
-                                              }
-                                                views:NSDictionaryOfVariableBindings(labelView)]];
   self.labelView = labelView;
+}
+
+- (void)updateConstraints {
+  if (!self.hasAddedConstraints) {
+    UILabel *labelView = self.labelView;
+    [self addConstraints:
+        [NSLayoutConstraint constraintsWithVisualFormat:@"|-(margin)-[labelView]-(margin)-|"
+                                                options:NSLayoutFormatAlignAllCenterY
+                                                metrics:@{
+                                                    @"margin": @(HorizontalMargin),
+                                                }
+                                                  views:NSDictionaryOfVariableBindings(labelView)]];
+    NSArray<NSLayoutConstraint *> *constraints =
+        [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[labelView(==height)]|"
+                                                options:NSLayoutFormatDirectionLeadingToTrailing
+                                                metrics:@{
+                                                    @"height": @(NavigationBarHeight)
+                                                }
+                                                  views:NSDictionaryOfVariableBindings(labelView)];
+    [self addConstraints:constraints];
+    self.topMargin = constraints[0];
+    self.hasAddedConstraints = YES;
+  }
+  if (self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClassCompact) {
+    self.topMargin.constant = StandardPadding;
+  } else {
+    self.topMargin.constant = StandardPadding + StatusBarHeight;
+  }
+  [super updateConstraints];
 }
 
 - (void)setIcon:(UIImage *_Nullable)icon {}
@@ -71,11 +88,14 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
 @interface DefaultLayout : UIView <ZTNLayout>
 @property(nonatomic) UIImageView *iconView;
 @property(nonatomic) UILabel *labelView;
+@property(nonatomic) NSLayoutConstraint *topMargin;
+@property(nonatomic, assign) BOOL hasAddedConstraints;
 @end
 
 @implementation DefaultLayout
 - (instancetype)init {
   if (self = [super init]) {
+    _hasAddedConstraints = NO;
     [self setupBackground];
     [self setupSubviews];
   }
@@ -99,33 +119,48 @@ static const CGFloat StatusBarHeight = 20, NavigationBarHeight = 44;
   labelView.font = [UIFont systemFontOfSize:15];
   [self addSubview:labelView];
 
-  [self addConstraints:
-      [NSLayoutConstraint constraintsWithVisualFormat:@"|-(margin)-[iconView]-(padding)-[labelView]-(margin)-|"
-                                              options:NSLayoutFormatAlignAllCenterY
-                                              metrics:@{
-                                                  @"margin": @(HorizontalMargin),
-                                                  @"padding": @(StandardPadding),
-                                              }
-                                                views:NSDictionaryOfVariableBindings(iconView, labelView)]];
-  [iconView setContentHuggingPriority:UILayoutPriorityDefaultLow + 1 forAxis:UILayoutConstraintAxisHorizontal];
-  [self addConstraint:
-      [NSLayoutConstraint constraintWithItem:iconView
-                                   attribute:NSLayoutAttributeHeight
-                                   relatedBy:NSLayoutRelationLessThanOrEqual
-                                      toItem:nil
-                                   attribute:NSLayoutAttributeNotAnAttribute
-                                  multiplier:1
-                                    constant:NavigationBarHeight]];
-  [self addConstraints:
-      [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(margin)-[labelView(==height)]|"
-                                              options:NSLayoutFormatDirectionLeadingToTrailing
-                                              metrics:@{
-                                                  @"margin": @(StandardPadding + StatusBarHeight),
-                                                  @"height": @(NavigationBarHeight)
-                                              }
-                                                views:NSDictionaryOfVariableBindings(labelView)]];
   self.iconView = iconView;
   self.labelView = labelView;
+}
+
+- (void)updateConstraints {
+  if (!self.hasAddedConstraints) {
+    UIImageView *iconView = self.iconView;
+    UILabel *labelView = self.labelView;
+    [self addConstraints:
+        [NSLayoutConstraint constraintsWithVisualFormat:@"|-(margin)-[iconView]-(padding)-[labelView]-(margin)-|"
+                                                options:NSLayoutFormatAlignAllCenterY
+                                                metrics:@{
+                                                    @"margin": @(HorizontalMargin),
+                                                    @"padding": @(StandardPadding),
+                                                }
+                                                  views:NSDictionaryOfVariableBindings(iconView, labelView)]];
+    [iconView setContentHuggingPriority:UILayoutPriorityDefaultLow + 1 forAxis:UILayoutConstraintAxisHorizontal];
+    [self addConstraint:
+        [NSLayoutConstraint constraintWithItem:iconView
+                                     attribute:NSLayoutAttributeHeight
+                                     relatedBy:NSLayoutRelationLessThanOrEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:1
+                                      constant:NavigationBarHeight]];
+    NSArray<NSLayoutConstraint *> *constraints =
+        [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[labelView(==height)]|"
+                                                options:NSLayoutFormatDirectionLeadingToTrailing
+                                                metrics:@{
+                                                    @"height": @(NavigationBarHeight)
+                                                }
+                                                  views:NSDictionaryOfVariableBindings(labelView)];
+    [self addConstraints:constraints];
+    self.topMargin = constraints[0];
+    self.hasAddedConstraints = YES;
+  }
+  if (self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClassCompact) {
+    self.topMargin.constant = StandardPadding;
+  } else {
+    self.topMargin.constant = StandardPadding + StatusBarHeight;
+  }
+  [super updateConstraints];
 }
 
 - (void)setIcon:(UIImage *_Nullable)icon {
