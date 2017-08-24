@@ -47,7 +47,6 @@ typedef UIView <ZTNLayout> *_Nonnull (^ZTNLayoutGeneratorBlock)();
  Register icons used in three shortcut notifying methods and `notifyMessage:withIconKey:` method.
 
  @note If register different icons with the same key multiple times, the last icon will take effect for that key.
- @param icons
  */
 + (void)registerIcons:(NSDictionary<NSString *, UIImage *> *_Nonnull)icons;
 
@@ -75,7 +74,6 @@ typedef UIView <ZTNLayout> *_Nonnull (^ZTNLayoutGeneratorBlock)();
  Notify custom view.
 
  @attention Leave extra `8pt` height padding area on top of the real content area.
- @param view
  */
 + (void)notifyView:(UIView *_Nonnull)view;
 
